@@ -1,0 +1,22 @@
+{
+  "name": "electron-telemetry",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:test": "cross-env TELEMETRY_MODE=test electron .",
+    "start:prod": "cross-env TELEMETRY_MODE=prod electron .",
+    "start:test-server": "node scripts/test-server.js",
+    "start:swagger": "node scripts/swagger-server.js",
+    "test:schema": "node scripts/validateTelemetryData.js --source=data/test-telemetry.json",
+    "test:prod-endpoint": "node scripts/test-prod-endpoint.js",
+    "test": "npm run test:schema"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Electron telemetry viewer for STM32/ESP WiFi JSON telemetry.",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^43.2.0"
+  }
+}

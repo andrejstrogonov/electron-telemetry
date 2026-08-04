@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: Telemetry API
+  version: '1.0.0'
+  description: |
+    API сервера STM32/ESP WiFi для получения телеметрии.
+    Поддерживается тестовый и production режимы через разные серверы.
+servers:
+  - url: http://localhost:8080
+    description: Тестовый сервер (локальный)
+  - url: https://prod.example.com
+    description: Production сервер
+paths:
+  /status:
+    get:
+      summary: Получить текущие данные телеметрии
+      description: Возвращает JSON с температурами, PWM, CRC, событиями, порогами и uptime.
+      responses:
+        '200':
+          description: Успешный ответ с телеметрией
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryResponse'
+              examples:
+                testData:
+                  summary: Пример данных от тестового сервера
+                  value:
+                    timestamp_ms: 1754012345678
+                    temperatures_c:
+                      stm32: 72.3
+                      fpga_1: 74.1
+                      fpga_2: 73.8
+                      hotspot: 74.1
+                    power:
+                      voltage_v: 4.98
+                      status: ok
+                    fan:
+                      pwm_percent: 42
+                      pin_fan_pwm: PA0
+                      pin_exp: PA1
+                      exp_flag: false
+                    crc:
+                      last_block_crc32: "0x9A3F2B1C"
+                      ok: true
+                    events:
+                      - type: anomaly_high_deviation
+                        timestamp_ms: 1754012300000
+                        value: 35.2
+                        deviation_percent: 37
+                    thresholds_c:
+                      target: 70.0
+                      max_safe: 85.0
+                    system:
+                      mode: normal
+                      uptime_s: 3421
+        '404':
+          description: Ресурс не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    TelemetryResponse:
+      type: object
+      required:
+        - timestamp_ms
+        - temperatures_c
+        - power
+        - fan
+        - crc
+        - events
+        - thresholds_c
+        - system
+      properties:
+        timestamp_ms:
+          type: integer
+          description: Метка времени в миллисекундах
+        temperatures_c:
+          type: object
+          additionalProperties:
+            type: number
+          description: Температуры компонентов в градусах Цельсия
+        power:
+          type: object
+          required:
+            - voltage_v
+            - status
+          properties:
+            voltage_v:
+              type: number
+              description: Напряжение питания в вольтах
+            status:
+              type: string
+              description: Статус питания
+        fan:
+          type: object
+          required:
+            - pwm_percent
+            - pin_fan_pwm
+            - pin_exp
+            - exp_flag
+          properties:
+            pwm_percent:
+              type: integer
+              description: Значение ШИМ вентилятора в процентах
+            pin_fan_pwm:
+              type: string
+              description: Номер пина управления ШИМ
+            pin_exp:
+              type: string
+              description: Номер пина расширения
+            exp_flag:
+              type: boolean
+              description: Флаг расширения вентилятора
+        crc:
+          type: object
+          required:
+            - last_block_crc32
+            - ok
+          properties:
+            last_block_crc32:
+              type: string
+              description: Значение CRC32 последнего блока
+            ok:
+              type: boolean
+              description: Статус корректности CRC
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+          description: Список событий и аномалий
+        thresholds_c:
+          type: object
+          required:
+            - target
+            - max_safe
+          properties:
+            target:
+              type: number
+              description: Целевая температура
+            max_safe:
+              type: number
+              description: Максимально безопасная температура
+        system:
+          type: object
+          required:
+            - mode
+            - uptime_s
+          properties:
+            mode:
+              type: string
+              description: Режим работы системы
+            uptime_s:
+              type: integer
+              description: Время работы системы в секундах
+    Event:
+      type: object
+      required:
+        - type
+        - timestamp_ms
+        - value
+        - deviation_percent
+      properties:
+        type:
+          type: string
+          description: Тип события
+        timestamp_ms:
+          type: integer
+          description: Временная метка события в миллисекундах
+        value:
+          type: number
+          description: Значение события
+        deviation_percent:
+          type: number
+          description: Отклонение в процентах
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Текст ошибки

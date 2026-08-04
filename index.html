@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Telemetry Viewer</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 16px; }
+    h2 { margin-top: 24px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+    th { background: #f5f5f5; }
+    .warning { color: #b71c1c; font-weight: bold; }
+    .ok { color: #1b5e20; }
+  </style>
+</head>
+<body>
+  <h1>Телеметрия системы</h1>
+    <div id="error-message" style="margin-bottom: 16px; color: #b71c1c; font-weight: bold;"></div>
+    <h2>Температуры (°C)</h2>
+    <table id="temps-table">
+      <thead>
+        <tr><th>Компонент</th><th>Температура</th><th>Статус</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Питание</h2>
+    <p>Напряжение: <span id="voltage"></span> В</p>
+    <p>Статус: <span id="power-status"></span></p>
+  </section>
+
+  <section>
+    <h2>Вентилятор</h2>
+    <p>PWM: <span id="fan-pwm"></span>%</p>
+    <p>Pin PWM: <span id="fan-pin-pwm"></span></p>
+    <p>Pin расширения: <span id="fan-pin-exp"></span></p>
+    <p>Флаг расширения: <span id="fan-exp-flag"></span></p>
+  </section>
+
+  <section>
+    <h2>CRC</h2>
+    <p>Последний CRC32: <span id="crc-value"></span></p>
+    <p>Статус: <span id="crc-status"></span></p>
+  </section>
+
+  <section>
+    <h2>События</h2>
+    <ul id="events-list"></ul>
+  </section>
+
+  <section>
+    <h2>Система</h2>
+    <p>Режим: <span id="system-mode"></span></p>
+    <p>Uptime: <span id="uptime"></span> с</p>
+  </section>
+
+  <script src="./renderer.js"></script>
+</body>
+</html>
